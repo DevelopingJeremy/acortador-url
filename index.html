@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acortador de URL</title>
+    <!-- CDNs -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<!-- 
+    Flujo:
+
+    Ingreso la URL
+    Llamo API con los datos
+    Leo URL, 
+-->
+
+<body>
+    <h1>Bienvenido a tu acortador de URLs</h1>
+
+    <input type="text">
+    <button type="submit">Acortar URL</button>
+
+    <script>
+
+        // Captura los parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+
+        // Obtiene el valor del parámetro "id"
+        const link = params.get('u')
+
+        console.log(link); // "aB3dE"
+
+        function esUrlValida(texto) {
+            try {
+                new URL(texto);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+    </script>
+</body>
+
+</html>

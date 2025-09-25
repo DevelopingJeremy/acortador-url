@@ -46,6 +46,7 @@ require_once __DIR__ . "/includes/constantes.php";
             $stmt->bind_param("s", $limpia);
 
             if ($stmt->execute()) {
+                http_response_code(200);
                 // Aumento de clicks exitoso
                 echo json_encode([
                     'success' => true,

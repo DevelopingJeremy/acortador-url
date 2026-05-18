@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acortador de URLs</title>
     <link rel="stylesheet" href="public/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -50,7 +51,7 @@
                 <p>Link original: <a id="linkOriginal" href="#" target="_blank"></a></p>
                 <p id="shortLinkRow">Link acortado: <a id="linkCorto" href="#" target="_blank"></a></p>
                 <div id="qrPreview" class="qr-preview">
-                    <img id="qrImage" alt="Codigo QR generado">
+                    <div id="qrCanvas" class="qr-canvas" aria-label="Codigo QR generado"></div>
                 </div>
             </div>
             <div class="buttons">

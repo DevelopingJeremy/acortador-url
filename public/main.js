@@ -9,7 +9,7 @@ function esUrlValida(texto) {
 }
 
 let valorParaCopiar = "";
-let qrGenerado = "";
+let qrDownloadUrl = "";
 
 function obtenerModo() {
     const modoSeleccionado = document.querySelector('input[name="modo"]:checked');
@@ -46,7 +46,7 @@ function crearNuevo() {
     document.getElementById("logoInput").value = "";
     document.getElementById("resultado").style.display = "none";
     valorParaCopiar = "";
-    qrGenerado = "";
+    limpiarQr();
 }
 
 function procesarFormulario() {
@@ -86,7 +86,7 @@ async function acortar() {
             if (data.success) {
                 const urlAcortada = data.url_nueva;
                 valorParaCopiar = urlAcortada;
-                qrGenerado = "";
+                limpiarQr();
 
                 resultado.style.display = 'block';
                 successMsg.innerText = "Tu link se ha acortado con exito.";
@@ -118,7 +118,6 @@ async function crearQr() {
     const successMsg = document.getElementById("successMsg");
     const shortLinkRow = document.getElementById("shortLinkRow");
     const qrPreview = document.getElementById("qrPreview");
-    const qrImage = document.getElementById("qrImage");
     const copyButton = document.getElementById("copyButton");
     const downloadButton = document.getElementById("downloadButton");
 
@@ -127,39 +126,39 @@ async function crearQr() {
         return;
     }
 
-    const formData = new FormData();
-    formData.append("url", input);
-
-    if (logoInput.files.length > 0) {
-        formData.append("logo", logoInput.files[0]);
-    }
-
     try {
-        const res = await fetch('/url-shortenner/src/api/generar_qr.php', {
-            method: 'POST',
-            body: formData
-        });
+        let logoDataUrl = "";
 
-        const data = await res.json();
+        if (logoInput.files.length > 0) {
+            const archivo = logoInput.files[0];
+            const tiposPermitidos = ["image/png", "image/jpeg", "image/webp"];
 
-        if (data.success) {
-            valorParaCopiar = data.url_directa;
-            qrGenerado = data.qr;
+            if (!tiposPermitidos.includes(archivo.type)) {
+                alert("La imagen debe ser PNG, JPG o WebP");
+                return;
+            }
 
-            resultado.style.display = "block";
-            successMsg.innerText = "Tu QR apunta directo al link original.";
-            linkOriginal.innerText = data.url_directa;
-            linkOriginal.href = data.url_directa;
-            linkCorto.innerText = "";
-            linkCorto.href = "#";
-            shortLinkRow.style.display = "none";
-            qrImage.src = data.qr;
-            qrPreview.style.display = "block";
-            copyButton.innerText = "Copiar URL";
-            downloadButton.style.display = "block";
-        } else {
-            throw new Error(data.message || "El backend devolvio error");
+            if (archivo.size > 2 * 1024 * 1024) {
+                alert("La imagen no debe superar 2 MB");
+                return;
+            }
+
+            logoDataUrl = await leerArchivoComoDataUrl(archivo);
         }
+
+        await renderizarQr(input, logoDataUrl);
+
+        valorParaCopiar = input;
+        resultado.style.display = "block";
+        successMsg.innerText = "Tu QR apunta directo al link original.";
+        linkOriginal.innerText = input;
+        linkOriginal.href = input;
+        linkCorto.innerText = "";
+        linkCorto.href = "#";
+        shortLinkRow.style.display = "none";
+        qrPreview.style.display = "block";
+        copyButton.innerText = "Copiar URL";
+        downloadButton.style.display = "block";
     } catch (error) {
         console.error("Error al generar el QR:", error);
         alert("UPS... Hubo un error generando el QR");
@@ -167,15 +166,80 @@ async function crearQr() {
 }
 
 function descargarQr() {
-    if (!qrGenerado) {
+    if (!qrDownloadUrl) {
         alert("Primero genera un QR");
         return;
     }
 
     const link = document.createElement("a");
-    link.href = qrGenerado;
+    link.href = qrDownloadUrl;
     link.download = "qr-url.png";
     document.body.appendChild(link);
     link.click();
     link.remove();
+}
+
+function limpiarQr() {
+    const qrCanvas = document.getElementById("qrCanvas");
+
+    if (qrCanvas) {
+        qrCanvas.innerHTML = "";
+    }
+
+    qrDownloadUrl = "";
+}
+
+function leerArchivoComoDataUrl(archivo) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+        reader.readAsDataURL(archivo);
+    });
+}
+
+async function renderizarQr(url, logoDataUrl) {
+    const qrCanvas = document.getElementById("qrCanvas");
+
+    limpiarQr();
+
+    new QRCode(qrCanvas, {
+        text: url,
+        width: 320,
+        height: 320,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    await esperarRenderQr();
+
+    const canvas = qrCanvas.querySelector("canvas");
+    const imagenQr = qrCanvas.querySelector("img");
+
+    if (logoDataUrl) {
+        const logo = document.createElement("img");
+        logo.src = logoDataUrl;
+        logo.alt = "Logo del QR";
+        logo.className = "qr-logo";
+        qrCanvas.appendChild(logo);
+    }
+
+    if (canvas) {
+        qrDownloadUrl = canvas.toDataURL("image/png");
+        return;
+    }
+
+    if (imagenQr) {
+        qrDownloadUrl = imagenQr.src;
+        return;
+    }
+
+    throw new Error("No se pudo renderizar el QR");
+}
+
+function esperarRenderQr() {
+    return new Promise((resolve) => {
+        requestAnimationFrame(() => resolve());
+    });
 }

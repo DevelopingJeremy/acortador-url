@@ -178,13 +178,33 @@ body {
     display: none;
     margin-top: 1rem;
 }
-.qr-preview img {
+.qr-canvas {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    margin: 0 auto;
+}
+.qr-canvas canvas,
+.qr-canvas img {
     width: min(100%, 320px);
     height: auto;
     border-radius: 12px;
     border: 1px solid #dce8f8;
     background: #fff;
     padding: 12px;
+}
+.qr-canvas .qr-logo {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 16px;
+    background: #ffffff;
+    padding: 6px;
+    border: 1px solid #dce8f8;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .buttons {

@@ -226,12 +226,12 @@ async function renderizarQr(url, logoDataUrl) {
     }
 
     if (canvas) {
-        qrDownloadUrl = canvas.toDataURL("image/png");
+        qrDownloadUrl = await construirQrDescargable(canvas, logoDataUrl);
         return;
     }
 
     if (imagenQr) {
-        qrDownloadUrl = imagenQr.src;
+        qrDownloadUrl = await construirQrDescargable(imagenQr, logoDataUrl);
         return;
     }
 
@@ -242,4 +242,66 @@ function esperarRenderQr() {
     return new Promise((resolve) => {
         requestAnimationFrame(() => resolve());
     });
+}
+
+async function construirQrDescargable(origenQr, logoDataUrl) {
+    const qrSize = 500;
+    const padding = 12;
+    const totalSize = qrSize + (padding * 2);
+    const canvas = document.createElement("canvas");
+    canvas.width = totalSize;
+    canvas.height = totalSize;
+
+    const context = canvas.getContext("2d");
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, totalSize, totalSize);
+
+    const qrImagen = await cargarImagen(typeof origenQr === "string" ? origenQr : origenQr.toDataURL("image/png"));
+    context.drawImage(qrImagen, padding, padding, qrSize, qrSize);
+
+    if (logoDataUrl) {
+        const logo = await cargarImagen(logoDataUrl);
+        const logoSize = 150;
+        const logoPadding = 6;
+        const logoBoxSize = logoSize + (logoPadding * 2);
+        const logoX = (totalSize - logoBoxSize) / 2;
+        const logoY = (totalSize - logoBoxSize) / 2;
+
+        context.fillStyle = "#ffffff";
+        dibujarRectanguloRedondeado(context, logoX, logoY, logoBoxSize, logoBoxSize, 16);
+        context.fill();
+
+        context.strokeStyle = "#dce8f8";
+        context.lineWidth = 1;
+        dibujarRectanguloRedondeado(context, logoX, logoY, logoBoxSize, logoBoxSize, 16);
+        context.stroke();
+
+        context.drawImage(logo, logoX + logoPadding, logoY + logoPadding, logoSize, logoSize);
+    }
+
+    return canvas.toDataURL("image/png");
+}
+
+function cargarImagen(src) {
+    return new Promise((resolve, reject) => {
+        const imagen = new Image();
+        imagen.onload = () => resolve(imagen);
+        imagen.onerror = () => reject(new Error("No se pudo preparar la imagen del QR"));
+        imagen.src = src;
+    });
+}
+
+function dibujarRectanguloRedondeado(context, x, y, width, height, radius) {
+    context.beginPath();
+    context.moveTo(x + radius, y);
+    context.lineTo(x + width - radius, y);
+    context.quadraticCurveTo(x + width, y, x + width, y + radius);
+    context.lineTo(x + width, y + height - radius);
+    context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    context.lineTo(x + radius, y + height);
+    context.quadraticCurveTo(x, y + height, x, y + height - radius);
+    context.lineTo(x, y + radius);
+    context.quadraticCurveTo(x, y, x + radius, y);
+    context.closePath();
 }

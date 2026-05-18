@@ -7,7 +7,7 @@ if (link) {
 
 async function redireccionar() {
     try {
-        const res = await fetch('/url-shortenner/src/api/obtener_url.php', {
+        const res = await fetch('/acortador/src/api/obtener_url.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -24,6 +24,6 @@ async function redireccionar() {
         }
     } catch (e) {
         console.error("Error al redireccionar: " + e);
-        
+
     }
 }

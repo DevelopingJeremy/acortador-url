@@ -75,39 +75,39 @@ async function acortar() {
     }
 
     try {
-            const res = await fetch('/url-shortenner/src/api/guardar_url.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: input })
-            });
+        const res = await fetch('/acortador/src/api/guardar_url.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: input })
+        });
 
-            const data = await res.json();
+        const data = await res.json();
 
-            if (data.success) {
-                const urlAcortada = data.url_nueva;
-                valorParaCopiar = urlAcortada;
-                limpiarQr();
+        if (data.success) {
+            const urlAcortada = data.url_nueva;
+            valorParaCopiar = urlAcortada;
+            limpiarQr();
 
-                resultado.style.display = 'block';
-                successMsg.innerText = "Tu link se ha acortado con exito.";
-                linkOriginal.innerText = input;
-                linkOriginal.href = input;
-                linkCorto.innerText = urlAcortada;
-                linkCorto.href = urlAcortada;
-                shortLinkRow.style.display = "block";
-                qrPreview.style.display = "none";
-                copyButton.innerText = "Copiar Link";
-                downloadButton.style.display = "none";
-            } else {
-                throw new Error("El backend devolvió error");
-            }
-
-        } catch (error) {
-            console.error('Error al guardar la URL:', error);
-            alert("UPS... Hubo un error, intentalo nuevamente")
-            return;
+            resultado.style.display = 'block';
+            successMsg.innerText = "Tu link se ha acortado con exito.";
+            linkOriginal.innerText = input;
+            linkOriginal.href = input;
+            linkCorto.innerText = urlAcortada;
+            linkCorto.href = urlAcortada;
+            shortLinkRow.style.display = "block";
+            qrPreview.style.display = "none";
+            copyButton.innerText = "Copiar Link";
+            downloadButton.style.display = "none";
+        } else {
+            throw new Error("El backend devolvió error");
         }
+
+    } catch (error) {
+        console.error('Error al guardar la URL:', error);
+        alert("UPS... Hubo un error, intentalo nuevamente")
+        return;
     }
+}
 
 async function crearQr() {
     const input = document.getElementById("urlInput").value;

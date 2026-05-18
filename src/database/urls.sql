@@ -39,7 +39,7 @@ CREATE TABLE `urls` (
 --
 
 INSERT INTO `urls` (`id_log`, `url_vieja`, `url_nueva`, `clicks`) VALUES
-(88, 'http://localhost:8888/phpMyAdmin5/index.php?route=/table/sql&db=acortador&table=urls', '7zExcO', 0);
+(88, 'https://acortador/phpMyAdmin5/index.php?route=/table/sql&db=acortador&table=urls', '7zExcO', 0);
 
 --
 -- Índices para tablas volcadas

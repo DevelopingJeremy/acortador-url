@@ -16,28 +16,47 @@
         <div class="logo">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#4a90e2"/><path d="M7 12h10M12 7v10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
-        <h1>Acortador de URLs</h1>
-        <p class="subtitle">Convierte tus links largos en algo elegante y perfecto para compartir en redes sociales.</p>
+        <h1>Links y QR</h1>
+        <p class="subtitle">Acorta links o crea codigos QR directos para compartirlos facilmente.</p>
     </header>
 
     <section class="container pro">
-        <form class="shorten-form" autocomplete="off" onsubmit="event.preventDefault(); acortar();">
+        <div class="mode-selector" role="group" aria-label="Seleccionar accion">
+            <label>
+                <input type="radio" name="modo" value="short" checked onchange="cambiarModo();">
+                <span>Acortar URL</span>
+            </label>
+            <label>
+                <input type="radio" name="modo" value="qr" onchange="cambiarModo();">
+                <span>Crear QR</span>
+            </label>
+        </div>
+
+        <form class="shorten-form" autocomplete="off" onsubmit="event.preventDefault(); procesarFormulario();">
             <input id="urlInput" type="text" placeholder="Pega tu link aquí, por ejemplo: https://www.google.com" required>
-            <button type="submit">Acortar Link</button>
+            <div id="qrOptions" class="qr-options">
+                <label for="logoInput">Foto para el centro del QR</label>
+                <input id="logoInput" type="file" accept="image/png,image/jpeg,image/webp">
+            </div>
+            <button id="submitButton" type="submit">Acortar Link</button>
         </form>
 
         <div id="resultado" class="result">
             <div class="success-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#2ecc71"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <p class="success-msg">¡Tu link se ha acortado con éxito!</p>
+            <p id="successMsg" class="success-msg">Tu link se ha acortado con exito.</p>
             <div class="links">
                 <p>Link original: <a id="linkOriginal" href="#" target="_blank"></a></p>
-                <p>Link acortado: <a id="linkCorto" href="#" target="_blank"></a></p>
+                <p id="shortLinkRow">Link acortado: <a id="linkCorto" href="#" target="_blank"></a></p>
+                <div id="qrPreview" class="qr-preview">
+                    <img id="qrImage" alt="Codigo QR generado">
+                </div>
             </div>
             <div class="buttons">
-                <button onclick="crearNuevo()">Crear nuevo link</button>
-                <button class="copy" onclick="copiar()">Copiar Link</button>
+                <button onclick="crearNuevo()">Crear nuevo</button>
+                <button id="copyButton" class="copy" onclick="copiar()">Copiar Link</button>
+                <button id="downloadButton" class="download" onclick="descargarQr()">Descargar QR</button>
             </div>
         </div>
     </section>
